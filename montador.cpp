@@ -20,7 +20,6 @@ public:
 
 void primeiraPassagem(string fname);
 void segundaPassagem(string fname);
-void ifequ(string fname);
 void macro(string fname);
 string macroProcessing(string line);
 string writeMacro(vector<string> elements, Macro macroobj);
@@ -76,27 +75,19 @@ void print_symbol_table()
 }
 
 int main(int argc, char **argv)
-{ // argv[0] é sempre o nome do programa
-    if (argc != 3)
+{
+    // argc should be 2 for 1 argument: file
+    if (argc != 2)
     {
         cout << "Número errado de argumentos" << endl;
     }
     else
     {
-        if (strncmp(argv[1], "-p", 2) == 0)
-        {
-            cout << "Processamento de EQU e IF. Extensão de saída PRE" << endl;
-            cout << endl;
-
-            ifequ(argv[2]);
-
-            cout << endl;
-            cout << endl;
-        }
-        else if (strncmp(argv[1], "-m", 2) == 0)
+        // checks if file extension is .mcr
+        if (strncmp(argv[1] + strlen(argv[1]) - 4, ".mcr", 4) == 0)
         {
             cout << "Processamento de Macros. Saída MCR" << endl;
-            macro(argv[2]);
+            macro(argv[1]);
         }
         else if (strncmp(argv[1], "-o", 2) == 0)
         {
@@ -233,6 +224,7 @@ void primeiraPassagem(string fname)
 
 void generateCode(string line)
 {
+    cout << "generateCode init" << endl;
     // Separa elementos da linha
     vector<string> tokens = splitString(line);
 
@@ -253,6 +245,7 @@ void generateCode(string line)
         // Consultar operação na tabela de opcodes(Erro de instrução inexistente)
         if (opcode_table.find(tokens[0]) != opcode_table.end())
         {
+            printf("Instruction: %s\n", tokens[0].c_str());
             // Checa número de argumentos passados
             if (tokens.size() != (opcode_table[tokens[0]][1]))
             {
@@ -301,6 +294,7 @@ void generateCode(string line)
         }
         else if (directive_table.find(tokens[0]) != directive_table.end())
         {
+            printf("Directive: %s\n", tokens[0].c_str());
             // Se for diretiva, checar se é CONST ou SPACE
             if (tokens[0] == "CONST")
             {
@@ -334,10 +328,13 @@ void generateCode(string line)
             }
             else if (tokens[0] == "SECTION")
             {
+                printf("SECTION: %s\n", tokens[1].c_str());
                 if (tokens.size() > 1)
                 {
+                    printf("SECTION: %s\n", tokens[1].c_str());
                     if (tokens[1] == "TEXT")
-                        text_section = true;
+                        printf("SECTION: %s\n", tokens[1].c_str());
+                    text_section = true;
                 }
             }
         }
@@ -352,7 +349,7 @@ void generateCode(string line)
 
 void segundaPassagem(string fname)
 {
-    cout << "segundaPassagem init" << endl;
+    cout << "INICIO SEGUNDA PASSAGEM" << endl;
     string fname_asm = static_cast<string>(fname) + ".mcr";
     line_counter = 1;
     // opens file
@@ -361,6 +358,7 @@ void segundaPassagem(string fname)
 
     while (getline(file, line_raw))
     {
+        cout << "LINE RAW: " << line_raw << endl;
         if (line_raw.find_first_not_of(" \t\n") != std::string::npos)
         {
             generateCode(line_raw);
@@ -427,16 +425,17 @@ string removeComments(string input)
 
 // MACRO
 
-// Chama as funções relacionadas ao processamento de macros e escreve o novo arquivo
+// Gera .pre a partir de arquivo .mcr
 void macro(string fname)
 {
     cout << "Processamento de macros" << endl;
-    string fname_pre = static_cast<string>(fname) + ".pre"; // Abre o arquivo com extensão .pre
+    // remove the extension from the file name
+    string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
 
-    ifstream file(fname_pre); // Arquivo .asm de entrada
+    ifstream file(fname); // Arquivo .asm de entrada
     string line_raw, file_line;
 
-    ofstream outfile(static_cast<string>(fname) + ".mcr"); // Arquivo de saída mcr
+    ofstream outfile(fname_without_extension + ".pre"); // Arquivo de saída mcr
 
     while (getline(file, line_raw))
     {
