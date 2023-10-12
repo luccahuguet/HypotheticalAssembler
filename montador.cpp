@@ -9,8 +9,9 @@
 using namespace std;
 
 // Macro Class
-class Macro {  
-  public:            
+class Macro
+{
+public:
     string name;
     int n_arguments;
     vector<pair<string, string>> arg_map;
@@ -32,22 +33,21 @@ string machine_code = "";
 unordered_map<string, int> symbol_table;
 unordered_map<string, int> equ_table;
 unordered_map<string, vector<int>> opcode_table = {
-    {"ADD",    {1, 2  }},
-    {"SUB",    {2, 2  }},
-    {"MULT",   {3, 2  }},
-    {"MUL",    {3, 2  }},
-    {"DIV",    {4, 2  }},
-    {"JMP",    {5, 2  }},
-    {"JMPN",   {6, 2  }},
-    {"JMPP",   {7, 2  }},
-    {"JMPZ",   {8, 2  }},
-    {"COPY",   {9, 3  }},
-    {"LOAD",   {10, 2 }},
-    {"STORE",  {11, 2 }},
-    {"INPUT",  {12, 2 }},
-    {"OUTPUT", {13, 2 }},
-    {"STOP",   {14, 1 }}
-};
+    {"ADD", {1, 2}},
+    {"SUB", {2, 2}},
+    {"MULT", {3, 2}},
+    {"MUL", {3, 2}},
+    {"DIV", {4, 2}},
+    {"JMP", {5, 2}},
+    {"JMPN", {6, 2}},
+    {"JMPP", {7, 2}},
+    {"JMPZ", {8, 2}},
+    {"COPY", {9, 3}},
+    {"LOAD", {10, 2}},
+    {"STORE", {11, 2}},
+    {"INPUT", {12, 2}},
+    {"OUTPUT", {13, 2}},
+    {"STOP", {14, 1}}};
 
 unordered_map<string, int> directive_table = {
     {"CONST", 1},
@@ -60,13 +60,12 @@ unordered_map<string, int> directive_table = {
 
 bool first = true;
 bool text_section = false;
-bool jump_line = false;  // Operador booleano usado no pré-processamento de IF
-bool insideMacro = false;  // Variável para saber se está dentro de macro na hora que estiver salvando
-bool defined = false; // Saber em qual macro salvar
+bool jump_line = false;   // Operador booleano usado no pré-processamento de IF
+bool insideMacro = false; // Variável para saber se está dentro de macro na hora que estiver salvando
+bool defined = false;     // Saber em qual macro salvar
 bool symbol_break = false;
 
 Macro macro1, macro2;
-
 
 void print_symbol_table()
 {
@@ -127,7 +126,7 @@ void updateSymbolTable(string line, string label = "")
         if (!only_label)
         {
             label = tokens[0].substr(0, tokens[0].length() - 1);
-            if(symbol_break == true) // Checar no caso de enter após o rótulo se a linha se inicia com outro rótulo
+            if (symbol_break == true) // Checar no caso de enter após o rótulo se a linha se inicia com outro rótulo
             {
                 cout << "Erro sintático na linha " << line_counter << ": Duas definições de rótulo na mesma linha" << endl;
                 exit(1);
@@ -171,7 +170,8 @@ void updateSymbolTable(string line, string label = "")
     }
     else
     {
-        if(symbol_break) symbol_break = false;
+        if (symbol_break)
+            symbol_break = false;
     }
 
     // Incrementar valores dos contadores
@@ -248,8 +248,8 @@ void generateCode(string line)
         tokens.erase(tokens.begin());
     }
     // Esturura atual do vetor [Intrução, operando1, ...]
-    if(tokens.size() > 0)  // Considerar caso de apenas rótulo na linha
-    {    
+    if (tokens.size() > 0) // Considerar caso de apenas rótulo na linha
+    {
         // Consultar operação na tabela de opcodes(Erro de instrução inexistente)
         if (opcode_table.find(tokens[0]) != opcode_table.end())
         {
@@ -308,11 +308,6 @@ void generateCode(string line)
                 {
                     cout << "Erro sintático na linha" << line_counter << ": Número errado de argumentos";
                     exit(1);
-                }
-                // Checar se é hexadecimal e converter para decimal
-                if(tokens[1][0] == '0' && (tokens[1][1] == 'X' || tokens[1][1] == 'x'))
-                {
-                    tokens[1] = to_string(stoi(tokens[1].substr(2, tokens[1].length() - 1), nullptr, 16));
                 }
                 // CONST, adicionar valor ao código
                 machine_code += " " + tokens[1];
@@ -424,7 +419,7 @@ string removeComments(string input)
         }
         else
         {
-            result += toupper(input[i]);  // Já adiciona convertendo para maiúsculo. Feito para atender a especificação de não ser case sensitive
+            result += toupper(input[i]); // Já adiciona convertendo para maiúsculo. Feito para atender a especificação de não ser case sensitive
         }
     }
     return result;
@@ -435,18 +430,18 @@ string removeComments(string input)
 */
 
 // IF e EQU
-string ifequprocessing(string line)  // Recebe a linha sem comentários, realiza o pré processamento e escreve no arquivo de saída
+string ifequprocessing(string line) // Recebe a linha sem comentários, realiza o pré processamento e escreve no arquivo de saída
 {
     // Split the line elements
     vector<string> tokens = splitString(line);
     int n_elements = tokens.size();
-    bool foundequ = false;  // Indica se a linha vai ser escrita no novo arquivo .pre
+    bool foundequ = false; // Indica se a linha vai ser escrita no novo arquivo .pre
     string pre_line = "";
 
     // Checa jump_line em caso de IF 0
-    if(jump_line)
+    if (jump_line)
     {
-        if(tokens[0] != "IF")
+        if (tokens[0] != "IF")
         {
             jump_line = false;
         }
@@ -457,12 +452,12 @@ string ifequprocessing(string line)  // Recebe a linha sem comentários, realiza
         // Verifica se o elemento é IF
         if (tokens[0] == "IF")
         {
-            if(n_elements > 1)
+            if (n_elements > 1)
             {
                 // Verifica valor do rótulo definido anteriormente
-                if(equ_table[tokens[1]] == 0)
+                if (equ_table[tokens[1]] == 0)
                 {
-                    jump_line = true;  // Indica o pulo de linha para a próxima
+                    jump_line = true; // Indica o pulo de linha para a próxima
                 }
             }
             return "";
@@ -471,7 +466,7 @@ string ifequprocessing(string line)  // Recebe a linha sem comentários, realiza
         // Checa se tem definição de rótulo
         if (tokens[0].back() == ':' && n_elements > 1 && tokens[1] == "EQU")
         {
-            if(n_elements == 3)
+            if (n_elements == 3)
             {
                 // Salva valor do rótulo definido pelo EQU
                 equ_table[tokens[0].substr(0, tokens[0].length() - 1)] = stoi(tokens[2]);
@@ -484,22 +479,24 @@ string ifequprocessing(string line)  // Recebe a linha sem comentários, realiza
             }
         }
 
-        for(int i = 0; i < n_elements; i++)
+        for (int i = 0; i < n_elements; i++)
         {
-            if(equ_table.find(tokens[i]) != equ_table.end())
+            if (equ_table.find(tokens[i]) != equ_table.end())
             {
                 foundequ = true;
                 tokens[i] = to_string(equ_table[tokens[i]]);
             }
             // Adicionar à string
-            if(i == 0) pre_line += tokens[0];
-            else pre_line += " " + tokens[i];
+            if (i == 0)
+                pre_line += tokens[0];
+            else
+                pre_line += " " + tokens[i];
         }
 
-        if(foundequ)  return pre_line;
+        if (foundequ)
+            return pre_line;
         return line;
     }
-
 }
 
 void ifequ(string fname)
@@ -507,10 +504,10 @@ void ifequ(string fname)
     cout << "Pré-processamento para IF e EQU" << endl;
     string fname_asm = static_cast<string>(fname) + ".asm";
 
-    ifstream file(fname_asm);  // Arquivo .asm de entrada
+    ifstream file(fname_asm); // Arquivo .asm de entrada
     string line_raw, file_line;
 
-    ofstream outfile(static_cast<string>(fname) + ".pre");  // Arquivo .pre de saída com os comentários removidos e pré-processamento de IF e EQU
+    ofstream outfile(static_cast<string>(fname) + ".pre"); // Arquivo .pre de saída com os comentários removidos e pré-processamento de IF e EQU
 
     while (getline(file, line_raw))
     {
@@ -520,9 +517,9 @@ void ifequ(string fname)
         {
             // Realiza pré-processamento da linha
             file_line = ifequprocessing(line);
-            if(file_line != "")
+            if (file_line != "")
             {
-                //write to file
+                // write to file
                 outfile << file_line << endl;
             }
         }
@@ -535,12 +532,12 @@ void ifequ(string fname)
 void macro(string fname)
 {
     cout << "Processamento de macros" << endl;
-    string fname_pre = static_cast<string>(fname) + ".pre";  // Abre o arquivo com extensão .pre
+    string fname_pre = static_cast<string>(fname) + ".pre"; // Abre o arquivo com extensão .pre
 
-    ifstream file(fname_pre);  // Arquivo .asm de entrada
+    ifstream file(fname_pre); // Arquivo .asm de entrada
     string line_raw, file_line;
 
-    ofstream outfile(static_cast<string>(fname) + ".mcr");  // Arquivo de saída mcr
+    ofstream outfile(static_cast<string>(fname) + ".mcr"); // Arquivo de saída mcr
 
     while (getline(file, line_raw))
     {
@@ -550,7 +547,7 @@ void macro(string fname)
         {
             // Realiza pré-processamento da linha
             file_line = macroProcessing(line);
-            if(file_line != "")
+            if (file_line != "")
             {
                 // cout << "LINE: " << file_line << endl;
                 // Write to file
@@ -568,30 +565,32 @@ string macroProcessing(string line)
     int n_elements = tokens.size();
     string pre_line = "";
     pair<string, string> argument;
-    if(insideMacro)  // Está no modo de salvar definição de macro
+    if (insideMacro) // Está no modo de salvar definição de macro
     {
-        if(tokens[0] == "ENDMACRO")
+        if (tokens[0] == "ENDMACRO")
         {
             insideMacro = false;
             defined = true;
         }
         else
         {
-            if(!defined) macro1.lines.push_back(line);
-            else macro2.lines.push_back(line);
+            if (!defined)
+                macro1.lines.push_back(line);
+            else
+                macro2.lines.push_back(line);
         }
     }
-    else  // Não está no modo de salvar macro
+    else // Não está no modo de salvar macro
     {
-        if(tokens[0].back() == ':' && n_elements > 1 && tokens[1] == "MACRO")  // Checa definição de macro
+        if (tokens[0].back() == ':' && n_elements > 1 && tokens[1] == "MACRO") // Checa definição de macro
         {
             // Indicar entrada em uma Macro
             insideMacro = true;
-            if(!defined)
+            if (!defined)
             {
                 macro1.name = tokens[0].substr(0, tokens[0].length() - 1);
                 macro1.n_arguments = n_elements - 2;
-                for(int i = 2; i < tokens.size(); i++)  // Salva o nome dos argumentos definidos
+                for (int i = 2; i < tokens.size(); i++) // Salva o nome dos argumentos definidos
                 {
                     argument.first = tokens[i];
                     macro1.arg_map.push_back(argument);
@@ -601,14 +600,14 @@ string macroProcessing(string line)
             {
                 macro2.name = tokens[0].substr(0, tokens[0].length() - 1);
                 macro2.n_arguments = n_elements - 2;
-                for(int i = 2; i < tokens.size(); i++)  // Salva o nome dos argumentos definidos
+                for (int i = 2; i < tokens.size(); i++) // Salva o nome dos argumentos definidos
                 {
                     argument.first = tokens[i];
                     macro2.arg_map.push_back(argument);
                 }
             }
         }
-        else if(tokens[0] == macro1.name)  // Checar se é nome de macro
+        else if (tokens[0] == macro1.name) // Checar se é nome de macro
         {
             pre_line = writeMacro(tokens, macro1);
         }
@@ -616,7 +615,7 @@ string macroProcessing(string line)
         {
             pre_line = writeMacro(tokens, macro2);
         }
-        else  // Linha que não precisa de tratamento, apenas escrever no novo arquivo
+        else // Linha que não precisa de tratamento, apenas escrever no novo arquivo
         {
             pre_line = line + "\n";
         }
@@ -627,27 +626,28 @@ string macroProcessing(string line)
 // Quando uma macro for chamada, realiza a preparação das instruções substituindo os argumentos quando necessário
 string writeMacro(vector<string> elements, Macro macroobj)
 {
-    bool foundarg = false;  // Indica se foi achado argumento e se precisa de substituição
-    string instructions = "";  // String com o conteúdo da macro que será formatado
+    bool foundarg = false;    // Indica se foi achado argumento e se precisa de substituição
+    string instructions = ""; // String com o conteúdo da macro que será formatado
     vector<string> instruction_elements;
     int line_size = 0;
     // Monta o arg_map
-    for(int i = 1; i < elements.size(); i++)
+    for (int i = 1; i < elements.size(); i++)
     {
-        macroobj.arg_map[i-1].second = elements[i];  // Realiza o mapeamento para os argumentos definidos anteriormente
+        macroobj.arg_map[i - 1].second = elements[i]; // Realiza o mapeamento para os argumentos definidos anteriormente
     }
     // Tratamento das instruções
-    for(int i = 0; i < macroobj.lines.size(); i++)
+    for (int i = 0; i < macroobj.lines.size(); i++)
     {
         instruction_elements = splitString(macroobj.lines[i]);
         line_size = instruction_elements.size();
-        for(int j = 0; j < line_size; j++)
+        for (int j = 0; j < line_size; j++)
         {
-            for(int a = 0; a < macroobj.arg_map.size(); a++)
+            for (int a = 0; a < macroobj.arg_map.size(); a++)
             {
-                if(instruction_elements[j] == macroobj.arg_map[a].first)
+                if (instruction_elements[j] == macroobj.arg_map[a].first)
                 {
-                    if(!foundarg) foundarg = true;
+                    if (!foundarg)
+                        foundarg = true;
                     // Substituir argumento
                     instruction_elements[j] = macroobj.arg_map[a].second;
                     break;
@@ -656,50 +656,54 @@ string writeMacro(vector<string> elements, Macro macroobj)
         }
 
         // Caso seja chamada de macro dentro da macro
-        if(instruction_elements[0] == macro1.name)
+        if (instruction_elements[0] == macro1.name)
         {
             instructions += writeMacro(instruction_elements, macro1);
-        }  
-        else if(instruction_elements[0] == macro2.name)
+        }
+        else if (instruction_elements[0] == macro2.name)
         {
             instructions += writeMacro(instruction_elements, macro2);
         }
-        else{
+        else
+        {
             // Adicionar a linha a string final
-            if(foundarg)  // Ocorreu alteração
+            if (foundarg) // Ocorreu alteração
             {
                 foundarg = false;
-                for(int e = 0; e < line_size; e++)
+                for (int e = 0; e < line_size; e++)
                 {
-                    if(instruction_elements[e] == "COPY")
+                    if (instruction_elements[e] == "COPY")
                     {
-                        if(e != 0) instructions += " ";
-                        if(line_size >= 3)
+                        if (e != 0)
+                            instructions += " ";
+                        if (line_size >= 3)
                         {
-                            instructions += instruction_elements[e] + " " + instruction_elements[e+1] + "," + instruction_elements[e+2] + "\n";
+                            instructions += instruction_elements[e] + " " + instruction_elements[e + 1] + "," + instruction_elements[e + 2] + "\n";
                         }
                         else
                         {
-                            if(e != line_size - 1)
+                            if (e != line_size - 1)
                             {
-                                instructions += instruction_elements[e] + " " + instruction_elements[e+1] + "\n";
+                                instructions += instruction_elements[e] + " " + instruction_elements[e + 1] + "\n";
                             }
                             else
-                                {
-                                    instructions += instruction_elements[e] + "\n";
-                                }
+                            {
+                                instructions += instruction_elements[e] + "\n";
+                            }
                         }
                         break;
                     }
                     else
                     {
-                        if(e != 0) instructions += " ";
+                        if (e != 0)
+                            instructions += " ";
                         instructions += instruction_elements[e];
-                        if(e == line_size - 1) instructions += "\n";
+                        if (e == line_size - 1)
+                            instructions += "\n";
                     }
                 }
             }
-            else  // Não teve substituição
+            else // Não teve substituição
             {
                 instructions += macroobj.lines[i] + "\n";
             }
