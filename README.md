@@ -1,17 +1,17 @@
 # sb-montador
-Repositório para o trabalho 1 da disciplina de Software Básico 2022.2, UnB
+Repositório para o trabalho 1 da disciplina de Software Básico 2023.2, UnB
 
 ## Integrantes
-~~Marcelo Aiache Postiglione - 180126652~~
-**Luca Barbabella - 180125559** 
-**Lucca Beserra Huguet - 160013259**
+**Luca Delpino Barbabella - 180125559**  
+**Lucca Beserra Huguet - 160013259**  
 
 ## Sistema operacional utilizado
 Kali GNU/Linux Rolling          
 Kernel: Linux 5.17.0-kali3-amd64
 
-## Versão do C++
+## Versões
 **C++17**
+**g++ 11.4.0**
 
 ## Instruções de compilação
 ```
