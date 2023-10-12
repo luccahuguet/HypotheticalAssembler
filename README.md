@@ -2,8 +2,8 @@
 Repositório para o trabalho 1 da disciplina de Software Básico 2022.2, UnB
 
 ## Integrantes
-**Marcelo Aiache Postiglione - 180126652**
-
+~~Marcelo Aiache Postiglione - 180126652~~
+**Luca Barbabella - 180125559** 
 **Lucca Beserra Huguet - 160013259**
 
 ## Sistema operacional utilizado
@@ -21,8 +21,6 @@ $ gcc montador.cpp -lstdc++ -o montador
 ## Rodando o programa
 Conforme solicitado na especificação o programa tem três modos de operação e leva como argumento o nome do arquivo sem a extensão.
 
-### Pré-processamento de IF e EQU
-O modo de operação para pré-processamento de IF e EQU é chamado pela flag "-p" e recebe como argumento o nome de um arquivo de extensão .asm. Por exemplo, para executar esse modo de operação para um arquivo chamado "exemplo.asm" que esteja presente no mesmo diretório de onde está sendo chamado o programa montador, digite o seguinte comando:
 
 ```
 $ ./montador -p exemplo
