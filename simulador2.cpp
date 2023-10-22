@@ -117,31 +117,80 @@ int main() {
                 }
                 break;
             case JMP:
-                // Update PC and ensure it's within bounds
-                PC = instructions[PC];
-                if (PC >= instructions.size()) {
-                    terminate = true;  // Jumped out of valid range, terminate execution
+                if (PC < instructions.size()) {
+                    int nextInstruction = instructions[PC++];
+                    if (data.find(nextInstruction) != data.end()) {
+                        PC = data[nextInstruction]; // set the PC to the specific instruction number
+                        if (PC >= instructions.size()) {
+                            cout << "Error: Jump address out of bounds." << endl;
+                            terminate = true;  // Jumped out of valid range, terminate execution
+                        }
+                    } else {
+                        cout << "Error: Jump address " << nextInstruction << " not initialized." << endl;
+                        terminate = true;
+                    }
+                } else {
+                    cout << "Error: Invalid instruction pointer." << endl;
+                    terminate = true; // Invalid instruction pointer, terminate execution
                 }
                 break;
             case JMPN:
-                if (ACC < 0 && PC < instructions.size()) {
-                    PC = instructions[PC];
+                if (PC < instructions.size()) {
+                    int nextInstruction = instructions[PC++];
+                    if (ACC < 0) {
+                        if (data.find(nextInstruction) != data.end()) {
+                            PC = data[nextInstruction];
+                            if (PC >= instructions.size()) {
+                                cout << "Error: Jump address out of bounds." << endl;
+                                terminate = true;
+                            }
+                        } else {
+                            cout << "Error: Jump address " << nextInstruction << " not initialized." << endl;
+                            terminate = true;
+                        }
+                    }
                 } else {
-                    ++PC;
+                    ++PC; // move to the next instruction if ACC is not negative
                 }
                 break;
+
             case JMPP:
-                if (ACC > 0 && PC < instructions.size()) {
-                    PC = instructions[PC];
+                if (PC < instructions.size()) {
+                    int nextInstruction = instructions[PC++];
+                    if (ACC > 0) {
+                        if (data.find(nextInstruction) != data.end()) {
+                            PC = data[nextInstruction];
+                            if (PC >= instructions.size()) {
+                                cout << "Error: Jump address out of bounds." << endl;
+                                terminate = true;
+                            }
+                        } else {
+                            cout << "Error: Jump address " << nextInstruction << " not initialized." << endl;
+                            terminate = true;
+                        }
+                    }
                 } else {
-                    ++PC;
+                    ++PC; // move to the next instruction if ACC is not positive
                 }
                 break;
+
             case JMPZ:
-                if (ACC == 0 && PC < instructions.size()) {
-                    PC = instructions[PC];
+                if (PC < instructions.size()) {
+                    int nextInstruction = instructions[PC++];
+                    if (ACC == 0) {
+                        if (data.find(nextInstruction) != data.end()) {
+                            PC = data[nextInstruction];
+                            if (PC >= instructions.size()) {
+                                cout << "Error: Jump address out of bounds." << endl;
+                                terminate = true;
+                            }
+                        } else {
+                            cout << "Error: Jump address " << nextInstruction << " not initialized." << endl;
+                            terminate = true;
+                        }
+                    }
                 } else {
-                    ++PC;
+                    ++PC; // move to the next instruction if ACC is not zero
                 }
                 break;
             case COPY:
