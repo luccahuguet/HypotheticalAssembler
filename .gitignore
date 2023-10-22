@@ -5,7 +5,7 @@
 *.slo
 *.lo
 *.o
-*.obj
+# *.obj
 
 # Precompiled Headers
 *.gch
@@ -28,7 +28,7 @@
 
 # Executables
 *.exe
-*.out
+# *.out
 *.app
 
 # Custom
@@ -36,4 +36,4 @@
 montador
 settings.json
 *.pre
-*.mcr
+# *.mcr
