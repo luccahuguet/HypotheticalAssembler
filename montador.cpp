@@ -361,7 +361,8 @@ void segundaPassagem(string fname)
         exit(1);
     }
     cout << "MACHINE CODE: " << machine_code << endl;
-    ofstream outfile(static_cast<string>(fname) + ".obj");
+    string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
+    ofstream outfile(static_cast<string>(fname_without_extension) + ".obj");
     outfile << machine_code;
     cout << "ARQUIVO OBJETO GERADO" << endl;
 }
@@ -422,7 +423,7 @@ void macro(string fname)
     // remove the extension from the file name
     string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
 
-    ifstream file(fname); // Arquivo .asm de entrada
+    ifstream file(fname); // Arquivo .mcr de entrada
     string line_raw, file_line;
 
     ofstream outfile(fname_without_extension + ".pre"); // Arquivo de saída mcr
@@ -443,6 +444,9 @@ void macro(string fname)
             }
         }
     }
+    // primeiraPassagem(fname_without_extension + ".pre");
+    // print_symbol_table();
+    // segundaPassagem(fname_without_extension + ".pre");
 }
 
 // Processa a linha a procura de definição ou chamada de macro
