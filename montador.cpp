@@ -194,10 +194,15 @@ void primeiraPassagem(string fname)
     cout << "PRIMEIRAPASSAGEM INIT" << endl;
 
     // opens file
-    ifstream file2(fname);
+    ifstream in_first(fname);
+    if (!in_first.is_open()) {
+        cerr << "Error: Unable to open file - " << fname << endl;
+        return; // Exit the function or handle the error as appropriate
+    }
+    // Similar check for 'file' in segundaPassagem
     string line_raw;
 
-    while (getline(file2, line_raw))
+    while (getline(in_first, line_raw))
     {
         if (line_raw.find_first_not_of(" \t\n") != std::string::npos)
         {
@@ -345,10 +350,14 @@ void segundaPassagem(string fname)
     cout << "INICIO SEGUNDA PASSAGEM" << endl;
     line_counter = 1;
     // opens file
-    ifstream file(fname);
+    ifstream in_second(fname);
+    if (!in_second.is_open()) {
+        cerr << "Error: Unable to open file - " << fname << endl;
+        return; // Exit the function or handle the error as appropriate
+    }
     string line_raw;
 
-    while (getline(file, line_raw))
+    while (getline(in_second, line_raw))
     {
         if (line_raw.find_first_not_of(" \t\n") != std::string::npos)
         {
@@ -362,8 +371,15 @@ void segundaPassagem(string fname)
     }
     cout << "MACHINE CODE: " << machine_code << endl;
     string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
-    ofstream outfile(static_cast<string>(fname_without_extension) + ".obj");
-    outfile << machine_code;
+
+    ofstream out_second(static_cast<string>(fname_without_extension) + ".obj");
+    if (!out_second.is_open()) {
+        cerr << "Error: Unable to create output file - " << fname_without_extension + ".obj" << endl;
+        return; // Exit the function or handle the error as appropriate
+    }
+
+    out_second << machine_code;
+    out_second.close(); // Ensure that the file is closed
     cout << "ARQUIVO OBJETO GERADO" << endl;
 }
 
@@ -416,37 +432,58 @@ string removeComments(string input)
 
 // MACRO
 
-// Gera .pre a partir de arquivo .mcr
+// Gera .pre e .obj a partir de arquivo .mcr
 void macro(string fname)
 {
     cout << "PROCESSAMENTO DE MACROS INIT" << endl;
     // remove the extension from the file name
     string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
 
-    ifstream file(fname); // Arquivo .mcr de entrada
+    ifstream macro_file(fname); // Arquivo .mcr de entrada
+    if (!macro_file.is_open()) {
+        cerr << "Error: Unable to open input file - " << fname << endl;
+        return; // Exit the function or handle the error as appropriate
+    }
+
+    ofstream out_macro(fname_without_extension + ".pre"); // Arquivo de saída .pre
+    if (!out_macro.is_open()) {
+        cerr << "Error: Unable to open/create output file - " << fname_without_extension + ".pre" << endl;
+        return; // Exit the function or handle the error as appropriate
+    }   
+
     string line_raw, file_line;
 
-    ofstream outfile(fname_without_extension + ".pre"); // Arquivo de saída mcr
-
-    while (getline(file, line_raw))
+    while (getline(macro_file, line_raw))
     {
-        // separa a linha em rótulo, operação, operandos, comentários
+        cout << "Raw Line: " << line_raw << endl; // Check raw line from the file
+
         string line = removeComments(line_raw);
+        cout << "Line without comments: " << line << endl; // Check the line after removing comments
+
         if (line.find_first_not_of(" \t\n") != std::string::npos)
         {
-            // Realiza pré-processamento da linha
             file_line = macroProcessing(line);
+            cout << "Processed Line: " << file_line << endl; // Check the line after processing
+
             if (file_line != "")
             {
-                // cout << "LINE: " << file_line << endl;
-                // Write to file
-                outfile << file_line;
+                out_macro << file_line; // Make sure this is executed
+            }
+            else
+            {
+                cout << "Warning: Processed line is empty!" << endl;
             }
         }
+        else
+        {
+            cout << "Warning: Line only contains whitespace!" << endl;
+        }
     }
-    // primeiraPassagem(fname_without_extension + ".pre");
-    // print_symbol_table();
-    // segundaPassagem(fname_without_extension + ".pre");
+    out_macro.close(); // Ensure that the file is closed
+
+    primeiraPassagem(fname_without_extension + ".pre");
+    print_symbol_table();
+    segundaPassagem(fname_without_extension + ".pre");
 }
 
 // Processa a linha a procura de definição ou chamada de macro
@@ -524,91 +561,6 @@ string macroProcessing(string line)
     return pre_line;
 }
 
-// string macroProcessing(string line)
-// {
-//     // Split the line elements
-//     vector<string> tokens = splitString(line);
-//     int n_elements = tokens.size();
-//     string pre_line = "";
-//     pair<string, string> argument;
-//     static bool skipMacro = false; // flag to indicate if we are skipping lines of an invalid macro
-
-//     if (skipMacro) // Check if we're currently skipping an invalid macro definition
-//     {
-//         if (tokens[0] == "ENDMACRO")
-//         {
-//             skipMacro = false;
-//         }
-//         return ""; // Skip this line
-//     }
-//     else if (insideMacro) // Check if we're inside a valid macro definition
-//     {
-//         if (tokens[0] == "ENDMACRO")
-//         {
-//             insideMacro = false;
-//             defined = true;
-//         }
-//         else
-//         {
-//             if (!defined)
-//                 macro1.lines.push_back(line);
-//             else
-//                 macro2.lines.push_back(line);
-//         }
-//     }
-//     else // Not inside a macro definition and not skipping lines
-//     {
-//         if (tokens[0].back() == ':' && n_elements > 1 && tokens[1] == "MACRO") // Check for macro definition
-//         {
-//             // Validate the number of parameters
-//             if (n_elements - 2 > 2)
-//             {
-//                 cerr << "Error: Macro " << tokens[0].substr(0, tokens[0].length() - 1) << " defined with more than 2 arguments. Skipping macro definition." << endl;
-//                 skipMacro = true; // Set flag to skip following lines until ENDMACRO
-//             }
-//             else
-//             {
-//                 insideMacro = true; // Start collecting lines for this macro
-//                 if (!defined)
-//                 {
-//                     macro1.name = tokens[0].substr(0, tokens[0].length() - 1);
-//                     macro1.n_arguments = n_elements - 2;
-//                     for (int i = 2; i < tokens.size(); i++) // Save the names of the defined arguments
-//                     {
-//                         argument.first = tokens[i];
-//                         macro1.arg_map.push_back(argument);
-//                     }
-//                 }
-//                 else
-//                 {
-//                     macro2.name = tokens[0].substr(0, tokens[0].length() - 1);
-//                     macro2.n_arguments = n_elements - 2;
-//                     for (int i = 2; i < tokens.size(); i++) // Save the names of the defined arguments
-//                     {
-//                         argument.first = tokens[i];
-//                         macro2.arg_map.push_back(argument);
-//                     }
-//                 }
-//             }
-//         }
-//         else if (!skipMacro) // Not in skipping mode, process lines normally
-//         {
-//             if (tokens[0] == macro1.name) // Checar se é nome de macro
-//             {
-//                 pre_line = writeMacro(tokens, macro1);
-//             }
-//             else if (tokens[0] == macro2.name)
-//             {
-//                 pre_line = writeMacro(tokens, macro2);
-//             }
-//             else // Linha que não precisa de tratamento, apenas escrever no novo arquivo
-//             {
-//                 pre_line = line + "\n";
-//             }
-//         }
-//     }
-//     return pre_line;
-// }
  // Quando uma macro for chamada, realiza a preparação das instruções substituindo os argumentos quando necessário
 string writeMacro(vector<string> elements, Macro macroobj)
 {
