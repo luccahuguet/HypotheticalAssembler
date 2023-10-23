@@ -83,19 +83,22 @@ int main(int argc, char **argv)
         // checks if file extension is .mcr
         if (strncmp(argv[1] + strlen(argv[1]) - 4, ".mcr", 4) == 0)
         {
-            cout << "Processamento de Macros. Saída MCR" << endl;
+            cout << "Processamento de Macros. Saídas .pre e .obj" << endl;
             macro(argv[1]);
+            cout << "end of program" << endl;
         }
         else if (strncmp(argv[1] + strlen(argv[1]) - 4, ".asm", 4) == 0)
         {
-            cout << "Processar tudo e criar arquivo objeto" << endl;
+            cout << "Processamento do arquivo .asm. Cria arquivo .obj sem preprocessar" << endl;
             primeiraPassagem(argv[1]);
-            print_symbol_table();
+            // print_symbol_table();
             segundaPassagem(argv[1]);
+            cout << "end of program" << endl;
         }
         else
         {
             cout << "Modo de operação não reconhecido" << endl;
+            cout << "end of program" << endl;
         }
     }
     return 0;
@@ -110,7 +113,6 @@ void updateSymbolTable(string line, string label = "")
 
     if (tokens[0].back() == ':') // Se o primeiro elemento da linha é um rótulo
     {
-        // cout << "updateSymbolTable init" << endl;
         if (!only_label)
         {
             label = tokens[0].substr(0, tokens[0].length() - 1);
@@ -191,7 +193,6 @@ void updateSymbolTable(string line, string label = "")
 
 void primeiraPassagem(string fname)
 {
-    cout << "PRIMEIRAPASSAGEM INIT" << endl;
 
     // opens file
     ifstream in_first(fname);
@@ -220,12 +221,10 @@ void primeiraPassagem(string fname)
             }
         }
     }
-    cout << "PRIMEIRA PASSAGEM FIM" << endl;
 }
 
 void generateCode(string line)
 {
-    // cout << "GENERATECODE INIT" << endl;
     // Separa elementos da linha
     vector<string> tokens = splitString(line);
 
@@ -246,7 +245,6 @@ void generateCode(string line)
         // Consultar operação na tabela de opcodes(Erro de instrução inexistente)
         if (opcode_table.find(tokens[0]) != opcode_table.end())
         {
-            printf("Instruction: %s\n", tokens[0].c_str());
             // Checa número de argumentos passados
             if (tokens.size() != (opcode_table[tokens[0]][1]))
             {
@@ -295,7 +293,6 @@ void generateCode(string line)
         }
         else if (directive_table.find(tokens[0]) != directive_table.end())
         {
-            printf("Directive: %s\n", tokens[0].c_str());
             // Se for diretiva, checar se é CONST ou SPACE
             if (tokens[0] == "CONST")
             {
@@ -347,7 +344,6 @@ void generateCode(string line)
 
 void segundaPassagem(string fname)
 {
-    cout << "INICIO SEGUNDA PASSAGEM" << endl;
     line_counter = 1;
     // opens file
     ifstream in_second(fname);
@@ -369,7 +365,6 @@ void segundaPassagem(string fname)
         cout << "Erro sintático no arquivo assembly: Seção TEXT faltando" << endl;
         exit(1);
     }
-    cout << "MACHINE CODE: " << machine_code << endl;
     string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
 
     ofstream out_second(static_cast<string>(fname_without_extension) + ".obj");
@@ -380,7 +375,6 @@ void segundaPassagem(string fname)
 
     out_second << machine_code;
     out_second.close(); // Ensure that the file is closed
-    cout << "ARQUIVO OBJETO GERADO" << endl;
 }
 
 vector<string> splitString(string input)
@@ -435,7 +429,6 @@ string removeComments(string input)
 // Gera .pre e .obj a partir de arquivo .mcr
 void macro(string fname)
 {
-    cout << "PROCESSAMENTO DE MACROS INIT" << endl;
     // remove the extension from the file name
     string fname_without_extension = static_cast<string>(fname).substr(0, static_cast<string>(fname).find_last_of("."));
 
@@ -455,34 +448,21 @@ void macro(string fname)
 
     while (getline(macro_file, line_raw))
     {
-        cout << "Raw Line: " << line_raw << endl; // Check raw line from the file
-
         string line = removeComments(line_raw);
-        cout << "Line without comments: " << line << endl; // Check the line after removing comments
 
         if (line.find_first_not_of(" \t\n") != std::string::npos)
         {
             file_line = macroProcessing(line);
-            cout << "Processed Line: " << file_line << endl; // Check the line after processing
-
             if (file_line != "")
             {
                 out_macro << file_line; // Make sure this is executed
             }
-            else
-            {
-                cout << "Warning: Processed line is empty!" << endl;
-            }
-        }
-        else
-        {
-            cout << "Warning: Line only contains whitespace!" << endl;
         }
     }
     out_macro.close(); // Ensure that the file is closed
 
     primeiraPassagem(fname_without_extension + ".pre");
-    print_symbol_table();
+    // print_symbol_table();
     segundaPassagem(fname_without_extension + ".pre");
 }
 
@@ -521,7 +501,6 @@ string macroProcessing(string line)
             {
                 cerr << "Error: Macro " << tokens[0].substr(0, tokens[0].length() - 1) << " defined with more than 2 arguments." << endl;
                 // Handle the error appropriately, possibly by skipping this macro definition
-                // insideMacro = false; // you may want a more robust way to handle this situation
             }            
 
             if (!defined)
