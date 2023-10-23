@@ -125,6 +125,9 @@ int main(int argc, char *argv[]){
     bool encerra = false;
     for (int i = 0; i < instructions.size(); i++)
     {
+        if(PC >= first_data_address)
+            cout << "SEGMENTATION FAULT: o PC acessou a secao de dados" << endl;
+
         if(instructions[i] != 12)
             cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
 
