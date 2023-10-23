@@ -15,7 +15,9 @@ Kernel: 6.5.4-76060504-generic
 
 ## Instruções de compilação
 ```
-$ gcc montador.cpp -lstdc++ -o montador 
+$ gcc montador.cpp -lstdc++ -o montador
+$ g++ simulador.cpp -o simulador
+
 ```
 
 ## Funcionamento do programa: Caso .asm
@@ -37,4 +39,13 @@ Esse modo irá gerar dois arquivos:
 - myprogram.obj  
 
 O arquivo .pre se trata do arquivo pré-processado com macros tratadas e o arquivo .obj é o código objeto
+
+## Rodando o simulador
+
+Após compilar o simulador conforme indicado, escreva o seguinte no terminal para executá-lo:
+```
+$ ./simulador arquivo_obj.obj
+```
+Onde "arquivo_obj.obj" é o arquivo objeto gerado pelo montador.
+
 
