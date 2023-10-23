@@ -44,6 +44,9 @@ int main(int argc, char *argv[]){
     // Close the file
     file.close();
 
+    if(input[input.size()-1] != ' ')
+        input.append(" ");
+
     int PC = 0, ACC;
 
     vector<string> instructions_string;
