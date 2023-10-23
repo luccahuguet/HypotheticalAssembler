@@ -49,7 +49,7 @@ int main(){
 
     int PC = 0, ACC;
 
-    string input = "12 22 10 22 2 23 8 18 11 21 3 22 11 22 10 21 5 4 13 22 14 0 0 1";
+    string input = "12 22 10 22 2 23 8 18 11 21 3 22 11 22 10 21 5 4 13 22 14 0 0 1 ";
     vector<string> instructions_string;
     vector<int> instructions;
 
@@ -59,7 +59,9 @@ int main(){
     for (int i = 0; i < instructions_string.size(); i++)
     {
         instructions.push_back(stoi(instructions_string[i]));
+        // cout << instructions[i] << " ";
     }
+    // cout << endl;
 
 
 
@@ -68,23 +70,26 @@ int main(){
 
     for (int i = 0; i < instructions.size(); i++)
     {
-        
-        if((instructions[i] >= 1 && instructions[i] <= 8) || (instructions[i] >= 10 && instructions[i] <= 13) )     // Instrucoes com 2 enderecos
+        // cout << instructions[i] << endl;
+        if((instructions[i] >= 1 && instructions[i] <= 4) || (instructions[i] >= 10 && instructions[i] <= 13) )     // Instrucoes com 2 enderecos
         {
             // Checa se label já está nos maps dos dados
             if(!dados.count(instructions[i+1]))
             {
-                // if(instructions[i+1] == 4)
-                    // cout << "AQUI " << i << endl;
-
+                // if(instructions[i+1] == 23)
+                //     cout << "BATATA " << instructions[instructions[i+1]] << endl;
                 dados.insert({instructions[i+1], instructions[instructions[i+1]]});
                 i++;
             }
             else
             {
-                i+=3;
+                i++;
             }
 
+        }
+        else if(instructions[i] >= 5 && instructions[i] <= 8)
+        {
+            i++;
         }
         else if(instructions[i] == 9)   // COPY
         {
@@ -136,23 +141,29 @@ int main(){
     }
     // cout << first_data_address << endl;    
 
+    // it_dados = dados.begin();
+    // while(it_dados != dados.end())
+    // {
+    //     cout << it_dados->first << " " << it_dados->second << endl;
+    //     it_dados++;
+    // }
 
 
 
 
 
+    
 
-
-
-
-
+    int conta = 0;
     bool encerra = false;
     for (int i = 0; i < instructions.size(); i++)
     {
-        if(encerra)
-            break;
+        conta ++;
+        // if(encerra)
+        //     break;
 
-        // getchar();
+        // if(conta == 26)
+        //     break;
 
         switch(instructions[i]) {
 
@@ -161,7 +172,7 @@ int main(){
                 PC += 2;
                 i++;
                 ACC += dados[instructions[i]];
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "ADD PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
             
             case 2:     // SUB
@@ -169,7 +180,7 @@ int main(){
                 PC += 2;
                 i++;
                 ACC -= dados[instructions[i]];
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "SUB PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
 
             case 3:     // MUL
@@ -177,7 +188,7 @@ int main(){
                 PC += 2;
                 i++;
                 ACC *= dados[instructions[i]];
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "MUL PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
 
             case 4:     // DIV
@@ -185,85 +196,110 @@ int main(){
                 PC += 2;
                 i++;
                 ACC /= dados[instructions[i]];
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "DIV PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
-            
+
+
+
+
+
+
+
             case 5:     // JMP
                 
-                PC += instructions[i+1];
-                i = PC;
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                i = instructions[i+1];
+                PC = i;
+                i-=1;
+
+                cout << "JMP PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
             
             case 6:     // JMPN
                 
                 if(ACC < 0)
                 {
-                    PC = instructions[i+1];
-                    i = PC;
+                    i = instructions[i+1];
+                    PC = i;
+                    i-=1;
                 }
-                else
-                {
+                else{
                     PC += 2;
                     i++;
                 }
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+
+                cout << "JMPN PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
             
             case 7:     // JUMPP
                 
                 if(ACC > 0)
                 {
-                    PC = instructions[i+1];
-                    i = PC;
+                    i = instructions[i+1];
+                    PC = i;
+                    i-=1;
                 }
-                else
-                {
+                else{
                     PC += 2;
                     i++;
                 }
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+
+                cout << "JMPP PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
             
             case 8:     // JMPZ
                 
                 if(ACC == 0)
                 {
-                    PC = instructions[i+1];
-                    i = PC;
+                    i = instructions[i+1];
+                    PC = i;
+                    i-=1;
                 }
-                else
-                {
+                else{
                     PC += 2;
                     i++;
                 }
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+
+                cout << "JMPZ PC <- " << PC << " ACC <- " << ACC << endl;
                 break;
+
+
+
+
+
+
+
+
+
+
+
+
             
             case 9:     // COPY
 
-                dados[i+2] = dados[instructions[i+1]];
+                dados[instructions[i+2]] = dados[instructions[i+1]];
                 PC += 3;
                 i+=2;
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "COPY PC <- " << PC << " ACC <- " << ACC << endl;
 
             break;
 
             case 10:     // LOAD
 
+                // cout << "endereco em que esta fazendo load: " << instructions[i+1] << endl;
                 ACC = dados[instructions[i+1]];
                 PC += 2;
                 i++;
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "LOAD PC <- " << PC << " ACC <- " << ACC << endl;
 
             break;
 
             case 11:     // STORE
 
+                // cout << "endereco em que esta fazendo store: " << instructions[i+1] << endl;
                 dados[instructions[i+1]] = ACC;
                 PC += 2;
                 i++;
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "STORE PC <- " << PC << " ACC <- " << ACC << endl;
 
             break;
 
@@ -272,21 +308,21 @@ int main(){
                 cin >> dados[instructions[i+1]];
                 PC += 2;
                 i++;
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "INPUT PC <- " << PC << " ACC <- " << ACC << endl;
 
             break;
 
             case 13:     // OUTPUT
                 PC += 2;
                 i++;
-                cout << "PC <- " << PC << " ACC <- " << ACC << " SAIDA: " << dados[instructions[i]] << endl;
+                cout << "OUTPUT PC <- " << PC << " ACC <- " << ACC << " SAIDA: " << dados[instructions[i]] << endl;
             break;
 
             case 14:     // STOP
                 encerra = true;
                 PC += 2;
                 i++;
-                cout << "PC <- " << PC << " ACC <- " << ACC << endl;
+                cout << "STOP PC <- " << PC << " ACC <- " << ACC << endl;
             break;
 
 
